@@ -9,6 +9,8 @@ namespace ConcertEvent
 {
     public class Event
     {
+        public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        
         public string? Name;
 
         public string? TicketLink;
@@ -20,24 +22,16 @@ namespace ConcertEvent
 
         public Venue? Venue;
 
-        public static bool IsValidUrl(string? str)
-        {
-            if (string.IsNullOrWhiteSpace(str))
-                return false;
-
-            return Uri.TryCreate(str, UriKind.Absolute, out var uri)
-                   && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
-        }
-
         public void PrintInfo()
         {
+            Console.WriteLine();
             Console.WriteLine("=== Event Info ===");
             Console.WriteLine($"Name: {Name}");
-            Console.WriteLine($"DateTime: {DateTime.ToString()}");
+            Console.WriteLine($"DateTime: {DateTime.ToString(Event.DateTimeFormat)}");
             Console.WriteLine($"Ticket Link: {TicketLink}");
             Console.WriteLine($"Artist: {Artist}");
             Console.WriteLine($"Venue: {Venue}");
-            Console.WriteLine("==================\n");
+            Console.WriteLine("==================");
         }
     }
 }

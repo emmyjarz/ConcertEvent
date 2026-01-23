@@ -8,11 +8,16 @@ namespace ConcertEvent
 {
     public class Helper
     {
-        public static bool TryParseDateTime(string? input, out DateTime dateTime)
+        public static bool TryParseDateTime(string? format, string? input, out DateTime dateTime)
         {
+            if (string.IsNullOrWhiteSpace(format))
+            {
+                format = "yyyy-MM-dd HH:mm:ss";
+            }
+
             return DateTime.TryParseExact(
                 input,
-                "yyyy-MM-dd HH:mm:ss",
+                format,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out dateTime

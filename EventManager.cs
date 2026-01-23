@@ -57,22 +57,23 @@ namespace ConcertEvent
         {
             while (true)
             {
-                Console.Write("Enter event datetime (yyyy-MM-dd HH:mm:ss): ");
+                var question = $"Enter event datetime ({Event.DateTimeFormat}): ";
+
+                Console.Write(question);
 
                 string input = Console.ReadLine() ?? "";
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.Write("Enter event datetime (yyyy-MM-dd HH:mm:ss): ");
+                    Console.Write(question);
                 }
 
-                if (Helper.TryParseDateTime(input, out DateTime dt))
+                if (Helper.TryParseDateTime(Event.DateTimeFormat, input, out DateTime dt))
                 {
                     return dt; // valid datetime, exit loop
                 }
 
-                Console.WriteLine("Invalid format! Please use yyyy-MM-dd HH:mm:ss");
-
+                Console.WriteLine($"Invalid format! Please use {Event.DateTimeFormat}");
             }
         }
 
@@ -80,13 +81,15 @@ namespace ConcertEvent
         {
             while (true)
             {
-                Console.Write("Enter ticket link url: ");
+                var question = "Enter ticket link url: ";
+
+                Console.Write(question);
 
                 string input = Console.ReadLine() ?? "";
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.Write("Enter ticket link url: ");
+                    Console.Write(question);
                 }
 
                 if (Helper.IsValidUrl(input))
