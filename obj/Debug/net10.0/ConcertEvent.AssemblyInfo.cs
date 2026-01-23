@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ConcertEvent")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18044f53dce340a5ff5485bef6db10587c9f1f1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea40c95e9129dbd4d73ec08aa7bb6c22ad279a28")]
 [assembly: System.Reflection.AssemblyProductAttribute("ConcertEvent")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ConcertEvent")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
