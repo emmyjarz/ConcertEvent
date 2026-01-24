@@ -10,7 +10,7 @@ namespace ConcertEvent
     public class Event
     {
         public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-        
+
         public string? Name;
 
         public string? TicketLink;
@@ -22,8 +22,14 @@ namespace ConcertEvent
 
         public Venue? Venue;
 
-        public void PrintInfo()
+        public void PrintInfo(bool eventNameOnly = false)
         {
+            if (eventNameOnly)
+            {
+                Console.WriteLine($"Name: {Name}");
+                return;
+            }
+
             Console.WriteLine();
             Console.WriteLine("=== Event Info ===");
             Console.WriteLine($"Name: {Name}");

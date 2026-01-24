@@ -14,7 +14,8 @@ namespace ConcertEvent
         public void AddEvent()
         {
             var response = "";
-            while (response != "YES")
+
+            while (response != "NO")
             {
                 var newEvent = new Event();
 
@@ -29,7 +30,6 @@ namespace ConcertEvent
 
                 newEvent.Name = eventName;
 
-                // Keep asking to get valid datetime
                 newEvent.DateTime = GetEventDateTime();
 
                 newEvent.TicketLink = GetTicketLink();
@@ -50,7 +50,20 @@ namespace ConcertEvent
 
                 newEvent.Venue = newVenue;
 
+                Events.Add(newEvent);
+
                 newEvent.PrintInfo();
+
+                Console.WriteLine("Would you like to add another event? Type Yes/No");
+
+                response = (Console.ReadLine())?.ToUpper();
+            }
+
+            Console.WriteLine($"You input {Events.Count} event(s).");
+
+            foreach (var eachEvent in Events)
+            {
+                eachEvent.PrintInfo(eventNameOnly: true);
             }
         }
         public DateTime GetEventDateTime()
