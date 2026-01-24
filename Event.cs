@@ -30,7 +30,6 @@ namespace ConcertEvent
                 return;
             }
 
-            Console.WriteLine();
             Console.WriteLine("=== Event Info ===");
             Console.WriteLine($"Name: {Name}");
             Console.WriteLine($"DateTime: {DateTime.ToString(Event.DateTimeFormat)}");
