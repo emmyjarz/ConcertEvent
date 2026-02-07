@@ -5,7 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security;
 using System.Threading.Tasks;
 
-namespace ConcertEvent
+namespace ConcertEvent.Models
 {
     public class Event
     {
@@ -22,20 +22,14 @@ namespace ConcertEvent
 
         public Venue? Venue;
 
-        public void PrintInfo(bool eventNameOnly = false)
+        public void PrintInfo()
         {
-            if (eventNameOnly)
-            {
-                Console.WriteLine($"Name: {Name}");
-                return;
-            }
-
             Console.WriteLine("=== Event Info ===");
             Console.WriteLine($"Name: {Name}");
             Console.WriteLine($"DateTime: {DateTime.ToString(Event.DateTimeFormat)}");
             Console.WriteLine($"Ticket Link: {TicketLink}");
-            Console.WriteLine($"Artist: {Artist}");
-            Console.WriteLine($"Venue: {Venue}");
+            Console.WriteLine($"Artist Name: {Artist?.Name}");
+            Console.WriteLine($"Venue: {Venue?.Name}");
             Console.WriteLine("==================");
         }
     }
