@@ -1,71 +1,86 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Security;
-using System.Threading.Tasks;
+using ConcertEvent.DataAccessLayer;
+using ConcertEvent.Models;
 
 namespace ConcertEvent
 {
     public class EventManager
     {
-        public List<Event> Events = new();
+        private readonly DALEvent _eventDal;
+        // private readonly DALArtist _artistDal;
+        // private readonly DALVenue _venueDal;
 
-        public void AddEvent()
+        public EventManager()
         {
-            var response = "";
+            _eventDal = new DALEvent();
+            // _artistDal = new DALArtist();
+            // _venueDal = new DALVenue();
+        }
 
-            while (response != "NO")
+        public void ListEvents()
+        {
+            var events = _eventDal.GetAll();
+            if (!events.Any())
             {
-                var newEvent = new Event();
-
-                string eventName;
-
-                do
-                {
-                    Console.Write("Let make an event. Enter event name: ");
-                    eventName = Console.ReadLine() ?? "";
-
-                } while (string.IsNullOrWhiteSpace(eventName));
-
-                newEvent.Name = eventName;
-
-                newEvent.DateTime = GetEventDateTime();
-
-                newEvent.TicketLink = GetTicketLink();
-
-                var newArtist = new Artist();
-
-                Console.Write("Enter artist name: ");
-
-                newArtist.Name = Console.ReadLine();
-
-                newEvent.Artist = newArtist;
-
-                var newVenue = new Venue();
-
-                Console.Write("Enter venue name: ");
-
-                newVenue.Name = Console.ReadLine();
-
-                newEvent.Venue = newVenue;
-
-                Events.Add(newEvent);
-
-                newEvent.PrintInfo();
-
-                Console.WriteLine("Would you like to add another event? Type Yes/No");
-
-                response = (Console.ReadLine())?.ToUpper();
+                Console.WriteLine("No events found.");
+                return;
             }
 
-            Console.WriteLine($"You input {Events.Count} event(s).");
-
-            foreach (var eachEvent in Events)
+            foreach (var eachEvent in events)
             {
-                eachEvent.PrintInfo(eventNameOnly: true);
+                eachEvent.PrintInfo();
             }
         }
+
+        // public void AddEvent()
+        // {
+        //     var response = "";
+
+        //     while (response != "NO")
+        //     {
+        //         var newEvent = new Event();
+
+        //         string eventName;
+
+        //         do
+        //         {
+        //             Console.Write("Let make an event. Enter event name: ");
+        //             eventName = Console.ReadLine() ?? "";
+
+        //         } while (string.IsNullOrWhiteSpace(eventName));
+
+        //         newEvent.Name = eventName;
+
+        //         newEvent.DateTime = GetEventDateTime();
+
+        //         newEvent.TicketLink = GetTicketLink();
+
+        //         var newArtist = new Artist();
+
+        //         Console.Write("Enter artist name: ");
+
+        //         newArtist.Name = Console.ReadLine();
+
+        //         newEvent.Artist = newArtist;
+
+        //         var newVenue = new Venue();
+
+        //         Console.Write("Enter venue name: ");
+
+        //         newVenue.Name = Console.ReadLine();
+
+        //         newEvent.Venue = newVenue;
+
+        //         Events.Add(newEvent);
+
+        //         newEvent.PrintInfo();
+
+        //         Console.WriteLine("Would you like to add another event? Type Yes/No");
+
+        //         response = (Console.ReadLine())?.ToUpper();
+        //     }
+
+
+        // }
         public DateTime GetEventDateTime()
         {
             while (true)
