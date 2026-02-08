@@ -6,14 +6,10 @@ namespace ConcertEvent
     public class EventManager
     {
         private readonly DALEvent _eventDal;
-        // private readonly DALArtist _artistDal;
-        // private readonly DALVenue _venueDal;
 
         public EventManager()
         {
             _eventDal = new DALEvent();
-            // _artistDal = new DALArtist();
-            // _venueDal = new DALVenue();
         }
 
         public void ListEvents()
@@ -31,56 +27,52 @@ namespace ConcertEvent
             }
         }
 
-        // public void AddEvent()
-        // {
-        //     var response = "";
+        public void AddEvent()
+        {
+            var response = "";
 
-        //     while (response != "NO")
-        //     {
-        //         var newEvent = new Event();
+            while (response != "NO")
+            {
+                var newEvent = new Event();
 
-        //         string eventName;
+                string eventName;
 
-        //         do
-        //         {
-        //             Console.Write("Let make an event. Enter event name: ");
-        //             eventName = Console.ReadLine() ?? "";
+                do
+                {
+                    Console.Write("Let make an event. Enter event name: ");
+                    eventName = Console.ReadLine() ?? "";
 
-        //         } while (string.IsNullOrWhiteSpace(eventName));
+                } while (string.IsNullOrWhiteSpace(eventName));
 
-        //         newEvent.Name = eventName;
+                newEvent.Name = eventName;
 
-        //         newEvent.DateTime = GetEventDateTime();
+                newEvent.DateTime = GetEventDateTime();
 
-        //         newEvent.TicketLink = GetTicketLink();
+                newEvent.TicketLink = GetTicketLink();
 
-        //         var newArtist = new Artist();
+                var newArtist = new Artist();
 
-        //         Console.Write("Enter artist name: ");
+                Console.Write("Enter artist name: ");
 
-        //         newArtist.Name = Console.ReadLine();
+                newArtist.Name = Console.ReadLine();
 
-        //         newEvent.Artist = newArtist;
+                newEvent.Artist = newArtist;
 
-        //         var newVenue = new Venue();
+                var newVenue = new Venue();
 
-        //         Console.Write("Enter venue name: ");
+                Console.Write("Enter venue name: ");
 
-        //         newVenue.Name = Console.ReadLine();
+                newVenue.Name = Console.ReadLine();
 
-        //         newEvent.Venue = newVenue;
+                newEvent.Venue = newVenue;
 
-        //         Events.Add(newEvent);
+                _eventDal.Insert(newEvent);
 
-        //         newEvent.PrintInfo();
+                Console.WriteLine("Would you like to add another event? Type Yes/No");
 
-        //         Console.WriteLine("Would you like to add another event? Type Yes/No");
-
-        //         response = (Console.ReadLine())?.ToUpper();
-        //     }
-
-
-        // }
+                response = (Console.ReadLine())?.ToUpper();
+            }
+        }
         public DateTime GetEventDateTime()
         {
             while (true)

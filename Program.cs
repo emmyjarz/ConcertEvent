@@ -1,10 +1,6 @@
 ﻿using ConcertEvent;
 using DotNetEnv;
 
-
-// var eventManager = new EventManager();
-
-// eventManager.AddEvent();
 class Program
 {
     static void Main()
@@ -32,9 +28,9 @@ class Program
                 case "1":
                     eventManager.ListEvents();
                     break;
-                // case "2":
-                //     eventManager.AddEvent();
-                //     break;
+                case "2":
+                    eventManager.AddEvent();
+                    break;
                 // case "3":
                 //     eventManager.UpdateEvent();
                 //     break;

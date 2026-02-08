@@ -18,6 +18,8 @@ namespace ConcertEvent.Models
 
         public Venue? Venue;
 
+        public Event() { }
+
         public Event(NpgsqlDataReader reader)
         {
             Id = reader.GetInt32(0);
@@ -31,7 +33,7 @@ namespace ConcertEvent.Models
         public void PrintInfo()
         {
             Console.WriteLine("=== Event Info ===");
-            Console.WriteLine($"ID: {Id}, Name: {Name}, DateTime: {DateTime.ToString(Event.DateTimeFormat)}, Ticket Link: {TicketLink}, Artist: {Artist?.Name}, Venue: {Venue?.Name}");
+            Console.WriteLine($"ID: {Id} | Name: {Name} | DateTime: {DateTime.ToString(Event.DateTimeFormat)} | Ticket Link: {TicketLink} | Artist: {Artist?.Name} | Venue: {Venue?.Name}");
             Console.WriteLine("==================");
         }
     }
