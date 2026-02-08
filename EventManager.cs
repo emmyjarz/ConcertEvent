@@ -46,9 +46,8 @@ namespace ConcertEvent
 
                 newEvent.Name = eventName;
 
-                newEvent.DateTime = GetEventDateTime();
-
-                newEvent.TicketLink = GetTicketLink();
+                newEvent.DateTime = PromptForEventDateTime();
+                newEvent.TicketLink = PromptForTicketLink();
 
                 var newArtist = new Artist();
 
@@ -73,7 +72,45 @@ namespace ConcertEvent
                 response = (Console.ReadLine())?.ToUpper();
             }
         }
-        public DateTime GetEventDateTime()
+
+        public void DeleteEvent()
+        {
+
+            Console.Write("Enter event ID to delete: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid event ID.");
+                return;
+            }
+
+            var existingEvent = _eventDal.GetOne(id);
+
+            if (existingEvent == null)
+            {
+                Console.WriteLine($"Event with ID {id} not found.");
+                return;
+            }
+
+            existingEvent.PrintInfo();
+
+            Console.Write("Are you sure you want to delete this event? (Yes/No): ");
+
+            var confirm = (Console.ReadLine())?.ToUpper();
+
+            if (confirm != "YES")
+            {
+                Console.WriteLine("Deletion cancelled.");
+                return;
+            }
+
+            _eventDal.Delete(id);
+
+            Console.WriteLine("Event deleted successfully.");
+            return;
+        }
+
+        public DateTime PromptForEventDateTime()
         {
             while (true)
             {
@@ -97,7 +134,7 @@ namespace ConcertEvent
             }
         }
 
-        public string GetTicketLink()
+        public string PromptForTicketLink()
         {
             while (true)
             {

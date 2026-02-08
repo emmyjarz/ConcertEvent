@@ -111,5 +111,54 @@ namespace ConcertEvent.DataAccessLayer
                 }
             }
         }
+
+        public Event? GetOne(int id)
+        {
+            string sql = @"SELECT e.id, e.name, e.ticket_link, e.date_time, v.name AS venue_name, STRING_AGG(a.name, ', ') AS artists_name 
+            FROM events e 
+            LEFT JOIN venues v ON e.venue_id = v.id 
+            LEFT JOIN event_artists ea ON e.id = ea.event_id 
+            LEFT JOIN artists a ON ea.artist_id = a.id 
+            WHERE e.id = @id
+            GROUP BY e.id, e.name, e.ticket_link, e.date_time, v.name";
+
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.Parameters.AddWithValue("@id", id);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            return null;
+                        }
+
+                        return new Event(reader);
+                    }
+                }
+            }
+        }
+
+        public void Delete(int id)
+        {
+            string sql = "DELETE FROM events WHERE id = @id";
+
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using var command = new NpgsqlCommand(sql, connection);
+
+                command.Parameters.AddWithValue("@id", id);
+
+                command.ExecuteNonQuery();
+            }
+
+        }
     }
 }

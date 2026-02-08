@@ -34,9 +34,9 @@ class Program
                 // case "3":
                 //     eventManager.UpdateEvent();
                 //     break;
-                // case "4":
-                //     eventManager.DeleteEvent();
-                //     break;
+                case "4":
+                    eventManager.DeleteEvent();
+                    break;
                 case "5":
                     exit = true;
                     break;
