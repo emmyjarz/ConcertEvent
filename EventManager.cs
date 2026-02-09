@@ -47,23 +47,10 @@ namespace ConcertEvent
 
         public void UpdateEvent()
         {
-            Console.Write("Enter event ID to update: ");
-
-            if (!int.TryParse(Console.ReadLine(), out int id))
-            {
-                Console.WriteLine("Invalid input.");
-                return;
-            }
-
-            var existingEvent = _eventDal.GetOne(id);
+            var existingEvent = PromptForGetEventById("update");
 
             if (existingEvent is null)
-            {
-                Console.WriteLine($"Event with ID {id} not found.");
                 return;
-            }
-
-            existingEvent.PrintInfo();
 
             Console.Write("Are you sure you want to update this event? (Yes/No): ");
 
@@ -79,29 +66,16 @@ namespace ConcertEvent
 
             updatedEvent.PrintInfo();
 
-            Console.WriteLine("Event updated successfully.");
+            Helper.WriteColored("Event updated successfully.", ConsoleColor.Green);
         }
 
 
         public void DeleteEvent()
         {
-            Console.Write("Enter event ID to delete: ");
-
-            if (!int.TryParse(Console.ReadLine(), out int id))
-            {
-                Console.WriteLine("Invalid input.");
-                return;
-            }
-
-            var existingEvent = _eventDal.GetOne(id);
+            var existingEvent = PromptForGetEventById("delete");
 
             if (existingEvent is null)
-            {
-                Console.WriteLine($"Event with ID {id} not found.");
                 return;
-            }
-
-            existingEvent.PrintInfo();
 
             Console.Write("Are you sure you want to delete this event? (Yes/No): ");
 
@@ -113,9 +87,9 @@ namespace ConcertEvent
                 return;
             }
 
-            _eventDal.Delete(id);
+            _eventDal.Delete(existingEvent.Id);
 
-            Console.WriteLine("Event deleted successfully.");
+            Helper.WriteColored($"Event with ID {existingEvent.Id} has been deleted.", ConsoleColor.Green);
             return;
         }
 
@@ -158,15 +132,14 @@ namespace ConcertEvent
         {
             while (true)
             {
-                var question = $"Enter event datetime ({Event.DateTimeFormat}): ";
-
-                Console.Write(question);
+                Console.Write($"Enter event datetime ({Event.DateTimeFormat}): ");
 
                 string input = Console.ReadLine() ?? "";
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.Write(question);
+                    Helper.WriteColored("Input cannot be empty!", ConsoleColor.Red);
+                    continue; // go back to the top of the loop
                 }
 
                 if (Helper.TryParseDateTime(Event.DateTimeFormat, input, out DateTime dt))
@@ -174,7 +147,7 @@ namespace ConcertEvent
                     return dt; // valid datetime, exit loop
                 }
 
-                Console.WriteLine($"Invalid format! Please use {Event.DateTimeFormat}");
+                Helper.WriteColored($"Invalid format! Please use {Event.DateTimeFormat}", ConsoleColor.Red);
             }
         }
 
@@ -182,15 +155,14 @@ namespace ConcertEvent
         {
             while (true)
             {
-                var question = "Enter ticket link url: ";
-
-                Console.Write(question);
+                Console.Write("Enter ticket link url: ");
 
                 string input = Console.ReadLine() ?? "";
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.Write(question);
+                    Helper.WriteColored("Input cannot be empty!", ConsoleColor.Red);
+                    continue; // go back to the top of the loop
                 }
 
                 if (Helper.IsValidUrl(input))
@@ -198,8 +170,32 @@ namespace ConcertEvent
                     return input;
                 }
 
-                Console.WriteLine("Invalid format! Please entry url");
+                Helper.WriteColored("Invalid format! Please entry url", ConsoleColor.Red);
             }
+        }
+
+        public Event? PromptForGetEventById(string action)
+        {
+            Console.Write($"Please enter event ID to {action}: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Helper.WriteColored("Invalid input. Please enter a valid integer ID.", ConsoleColor.Red);
+
+                return null;
+            }
+
+            var existingEvent = _eventDal.GetOne(id);
+
+            if (existingEvent is null)
+            {
+                Helper.WriteColored($"Event with ID {id} not found.", ConsoleColor.Red);
+                return null;
+            }
+
+            existingEvent.PrintInfo();
+
+            return existingEvent;
         }
     }
 }

@@ -32,5 +32,12 @@ namespace ConcertEvent
             return Uri.TryCreate(input, UriKind.Absolute, out Uri? uri)
                    && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
         }
+
+        public static void WriteColored(string message, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
     }
 }
