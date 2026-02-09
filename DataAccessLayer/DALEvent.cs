@@ -50,68 +50,6 @@ namespace ConcertEvent.DataAccessLayer
             return result;
         }
 
-        public void Insert(Event ev)
-        {
-            int? venueId = null;
-
-            if (!string.IsNullOrEmpty(ev.Venue?.Name))
-            {
-                venueId = new DALVenue().GetOrCreateByName(ev.Venue.Name.Trim());
-            }
-
-            int[] artistIds = Array.Empty<int>();
-
-            if (!string.IsNullOrEmpty(ev.Artist?.Name))
-            {
-                artistIds = ev.Artist?.Name.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(name => new DALArtist().GetOrCreateByName(name.Trim()))
-                    .ToArray() ?? Array.Empty<int>();
-            }
-
-            string sql = @"
-                INSERT INTO events (name, ticket_link, date_time, venue_id)
-                VALUES (@name, @ticketLink, @dateTime, @venueId)
-                RETURNING id;
-            ";
-
-            int eventId;
-
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (var command = connection.CreateCommand())
-                {
-                    using var cmd = new NpgsqlCommand(sql, connection);
-
-                    cmd.Parameters.AddWithValue("@name", ev.Name!);
-                    cmd.Parameters.AddWithValue("@ticketLink", ev.TicketLink!);
-                    cmd.Parameters.AddWithValue("@dateTime", ev.DateTime);
-                    cmd.Parameters.AddWithValue("@venueId", venueId.HasValue ? venueId.Value : DBNull.Value);
-                    eventId = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-
-            if (artistIds.Length > 0)
-            {
-                string artistSql = $"INSERT INTO event_artists (event_id, artist_id) VALUES (@eventId, @artistId)";
-
-                using (var connection = new NpgsqlConnection(_connectionString))
-                {
-                    connection.Open();
-                    foreach (var artistId in artistIds)
-                    {
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.CommandText = artistSql;
-                            command.Parameters.AddWithValue("@eventId", eventId);
-                            command.Parameters.AddWithValue("@artistId", artistId);
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-        }
-
         public Event? GetOne(int id)
         {
             string sql = @"SELECT e.id, e.name, e.ticket_link, e.date_time, v.name AS venue_name, STRING_AGG(a.name, ', ') AS artists_name 
@@ -144,6 +82,74 @@ namespace ConcertEvent.DataAccessLayer
             }
         }
 
+        public Event CreateOrUpdate(Event ev)
+        {
+            int? venueId = null;
+
+            if (!string.IsNullOrEmpty(ev.Venue?.Name))
+            {
+                venueId = new DALVenue().GetOrCreateByName(ev.Venue.Name.Trim());
+            }
+
+            int[] artistIds = new DALArtist().GetOrCreateByNames(ev.Artist?.Name);
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                if (ev.Id > 0)
+                {
+                    // UPDATE
+                    const string updateSql = @"UPDATE events 
+                    SET name = @name, 
+                    ticket_link = @ticketLink,
+                    date_time = @dateTime,
+                    venue_id = @venueId
+                    WHERE id = @id;";
+
+                    using var cmd = new NpgsqlCommand(updateSql, connection, transaction);
+                    cmd.Parameters.AddWithValue("@id", ev.Id);
+                    cmd.Parameters.AddWithValue("@name", ev.Name!);
+                    cmd.Parameters.AddWithValue("@ticketLink", ev.TicketLink!);
+                    cmd.Parameters.AddWithValue("@dateTime", ev.DateTime);
+                    cmd.Parameters.AddWithValue("@venueId",
+                        venueId.HasValue ? venueId.Value : DBNull.Value);
+
+                    cmd.ExecuteNonQuery();
+                }
+                else
+                {
+                    // INSERT
+                    const string insertSql = @"INSERT INTO events (name, ticket_link, date_time, venue_id) VALUES (@name, @ticketLink, @dateTime, @venueId) RETURNING id;";
+
+                    using var cmd = new NpgsqlCommand(insertSql, connection, transaction);
+                    cmd.Parameters.AddWithValue("@name", ev.Name!);
+                    cmd.Parameters.AddWithValue("@ticketLink", ev.TicketLink!);
+                    cmd.Parameters.AddWithValue("@dateTime", ev.DateTime);
+                    cmd.Parameters.AddWithValue("@venueId",
+                        venueId.HasValue ? venueId.Value : DBNull.Value);
+
+                    ev.Id = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                // Sync artists
+                SyncArtists(ev.Id, artistIds, connection, transaction);
+
+                transaction.Commit();
+
+                return ev;
+            }
+            catch
+            {
+                transaction.Rollback();
+
+                throw;
+            }
+        }
+
         public void Delete(int id)
         {
             string sql = "DELETE FROM events WHERE id = @id";
@@ -158,7 +164,36 @@ namespace ConcertEvent.DataAccessLayer
 
                 command.ExecuteNonQuery();
             }
+        }
+        private void SyncArtists(
+            int eventId,
+            int[] artistIds,
+            NpgsqlConnection connection,
+            NpgsqlTransaction transaction)
+        {
+            // Remove old relationships
+            using (var deleteCmd = new NpgsqlCommand(
+                "DELETE FROM event_artists WHERE event_id = @eventId",
+                connection,
+                transaction))
+            {
+                deleteCmd.Parameters.AddWithValue("@eventId", eventId);
+                deleteCmd.ExecuteNonQuery();
+            }
 
+            // Insert new relationships
+            if (artistIds.Length == 0)
+                return;
+
+            const string insertSql = @"INSERT INTO event_artists (event_id, artist_id) VALUES (@eventId, @artistId);";
+
+            foreach (var artistId in artistIds)
+            {
+                using var insertCmd = new NpgsqlCommand(insertSql, connection, transaction);
+                insertCmd.Parameters.AddWithValue("@eventId", eventId);
+                insertCmd.Parameters.AddWithValue("@artistId", artistId);
+                insertCmd.ExecuteNonQuery();
+            }
         }
     }
 }

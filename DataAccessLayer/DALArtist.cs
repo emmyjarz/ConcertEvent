@@ -59,5 +59,17 @@ namespace ConcertEvent.DataAccessLayer
 
             return Insert(name);
         }
+
+        public int[] GetOrCreateByNames(string? names)
+        {
+            if (string.IsNullOrEmpty(names))
+            {
+                return Array.Empty<int>();
+            }
+
+            return names.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                      .Select(name => new DALArtist().GetOrCreateByName(name.Trim()))
+                      .ToArray() ?? Array.Empty<int>();
+        }
     }
 }

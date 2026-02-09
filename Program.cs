@@ -31,9 +31,9 @@ class Program
                 case "2":
                     eventManager.AddEvent();
                     break;
-                // case "3":
-                //     eventManager.UpdateEvent();
-                //     break;
+                case "3":
+                    eventManager.UpdateEvent();
+                    break;
                 case "4":
                     eventManager.DeleteEvent();
                     break;

@@ -33,39 +33,11 @@ namespace ConcertEvent
 
             while (response != "NO")
             {
-                var newEvent = new Event();
+                Event newEvent = PromptForEventInfo(new Event());
 
-                string eventName;
+                var createdEvent = _eventDal.CreateOrUpdate(newEvent);
 
-                do
-                {
-                    Console.Write("Let make an event. Enter event name: ");
-                    eventName = Console.ReadLine() ?? "";
-
-                } while (string.IsNullOrWhiteSpace(eventName));
-
-                newEvent.Name = eventName;
-
-                newEvent.DateTime = PromptForEventDateTime();
-                newEvent.TicketLink = PromptForTicketLink();
-
-                var newArtist = new Artist();
-
-                Console.Write("Enter artist name: ");
-
-                newArtist.Name = Console.ReadLine();
-
-                newEvent.Artist = newArtist;
-
-                var newVenue = new Venue();
-
-                Console.Write("Enter venue name: ");
-
-                newVenue.Name = Console.ReadLine();
-
-                newEvent.Venue = newVenue;
-
-                _eventDal.Insert(newEvent);
+                createdEvent.PrintInfo();
 
                 Console.WriteLine("Would you like to add another event? Type Yes/No");
 
@@ -73,20 +45,57 @@ namespace ConcertEvent
             }
         }
 
-        public void DeleteEvent()
+        public void UpdateEvent()
         {
-
-            Console.Write("Enter event ID to delete: ");
+            Console.Write("Enter event ID to update: ");
 
             if (!int.TryParse(Console.ReadLine(), out int id))
             {
-                Console.WriteLine("Invalid input. Please enter a valid event ID.");
+                Console.WriteLine("Invalid input.");
                 return;
             }
 
             var existingEvent = _eventDal.GetOne(id);
 
-            if (existingEvent == null)
+            if (existingEvent is null)
+            {
+                Console.WriteLine($"Event with ID {id} not found.");
+                return;
+            }
+
+            existingEvent.PrintInfo();
+
+            Console.Write("Are you sure you want to update this event? (Yes/No): ");
+
+            var confirm = (Console.ReadLine())?.ToUpper();
+
+            if (confirm != "YES")
+            {
+                Console.WriteLine("Update cancelled.");
+                return;
+            }
+
+            var updatedEvent = _eventDal.CreateOrUpdate(PromptForEventInfo(existingEvent));
+
+            updatedEvent.PrintInfo();
+
+            Console.WriteLine("Event updated successfully.");
+        }
+
+
+        public void DeleteEvent()
+        {
+            Console.Write("Enter event ID to delete: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Invalid input.");
+                return;
+            }
+
+            var existingEvent = _eventDal.GetOne(id);
+
+            if (existingEvent is null)
             {
                 Console.WriteLine($"Event with ID {id} not found.");
                 return;
@@ -108,6 +117,41 @@ namespace ConcertEvent
 
             Console.WriteLine("Event deleted successfully.");
             return;
+        }
+
+        public Event PromptForEventInfo(Event newEvent)
+        {
+            string eventName;
+
+            do
+            {
+                Console.Write("Enter event name: ");
+                eventName = Console.ReadLine() ?? "";
+
+            } while (string.IsNullOrWhiteSpace(eventName));
+
+            newEvent.Name = eventName;
+
+            newEvent.DateTime = PromptForEventDateTime();
+            newEvent.TicketLink = PromptForTicketLink();
+
+            var newArtist = new Artist();
+
+            Console.Write("Enter artist name: ");
+
+            newArtist.Name = Console.ReadLine();
+
+            newEvent.Artist = newArtist;
+
+            var newVenue = new Venue();
+
+            Console.Write("Enter venue name: ");
+
+            newVenue.Name = Console.ReadLine();
+
+            newEvent.Venue = newVenue;
+
+            return newEvent;
         }
 
         public DateTime PromptForEventDateTime()
